@@ -5,7 +5,7 @@ from pathlib import Path
 import csv
 import numpy as np
 
-from ndksens import conflimits
+from ndksens import feldmancousins_lookup
 from ndksens import experiment
 from ndksens import mode
 from ndksens import source
@@ -17,8 +17,8 @@ DATA_PATH = Path(__file__).resolve().parent.parent / "data"
 
 def main():
     # Feldman-Cousins average upper limits
-    fcm = conflimits.FCMemoizer(90)
-    fcm.ReadTableAverageUpperLimits(DATA_PATH / "FC90.dat")
+    aul_lookup = feldmancousins_lookup.AverageUpperLimitLookup(cl=0.90)
+    aul_lookup.read_table(DATA_PATH / "FC90.dat")
 
     # Custom DUNE configuration
     dune = experiment.Experiment(
@@ -37,7 +37,7 @@ def main():
 
         for exposure_kty in np.arange(5.0, 6005.0, 5.0):
             exposure = exposure_kty * units.kton * units.year
-            sensitivity = dune.sensitivity(exposure, fcm)
+            sensitivity = dune.sensitivity(exposure, aul_lookup)
 
             exposure_value = exposure / (units.kton * units.year)
             sensitivity_value = sensitivity / units.year

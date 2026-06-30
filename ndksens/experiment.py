@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 
-from . import conflimits
+from . import feldmancousins_lookup
 from . import mode
 from . import source
 from . import units
@@ -24,9 +24,9 @@ class Experiment:
         return self.bgr * exposure
 
     def sensitivity(self, exposure: float,
-                    clc: conflimits.FCMemoizer) -> float:
+                    aul_lookup: feldmancousins_lookup.AverageUpperLimitLookup) -> float:
         """Partial lifetime sensitivity."""
-        aul = clc.AverageUpperLimit(self.Nbkg(exposure))
+        aul = aul_lookup.average_upper_limit(self.Nbkg(exposure))
         return (
             self.source.protonsperunitmass
             * self.eff
@@ -122,8 +122,8 @@ if __name__ == "__main__":
         1.0 / (units.Mton * units.year),
     )
 
-    FC = conflimits.FCMemoizer(90)
-    FC.ReadTableAverageUpperLimits()
+    aul_lookup = feldmancousins_lookup.AverageUpperLimitLookup(cl=0.90)
+    aul_lookup.read_table()
 
     sens = dune_test.sensitivity(
         400 * units.kton * units.year,

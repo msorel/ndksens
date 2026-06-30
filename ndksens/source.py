@@ -62,58 +62,5 @@ if __name__ == "__main__":
 
 
 
-
-
     
 
-'''
-
-"""docstring for module source"""
-
-from . import units
-#import math
-
-
-
-class Source:
-    """docstring for Source"""
-
-    def __init__(self, symbol, protonsperunitmass, neutronsperunitmass):
-        super().__init__()
-        self.symbol = symbol
-        self.protonsperunitmass = protonsperunitmass # protons per unit mass
-        self.neutronsperunitmass = neutronsperunitmass # neutrons per unit mass
-
-
-############################################################
-### SOURCES --- DATABASE
-
-### Ar
-symbol = 'Ar'
-protonsperunitmass = 2.71E32*(1/units.kton)
-neutronsperunitmass = 3.31E32*(1/units.kton)
-Ar = Source(symbol, protonsperunitmass, neutronsperunitmass)
-
-### H2O 
-symbol = 'H2O'
-protonsperunitmass = 3.34E32*(1/units.kton)
-neutronsperunitmass = 2.68E32*(1/units.kton)
-H2O = Source(symbol, protonsperunitmass, neutronsperunitmass)
-
-
-
-##############################
-### DICTIONARY ###############
-
-sources = {Ar.symbol: Ar, H2O.symbol: H2O}
-
-############################################################
-
-
-if __name__ == '__main__':
-
-    print ("source.py executed directly")
-    #print ("Protons per kton of argon: {0:.1e}".format(Ar.protonsperunitmass/(1/units.kton)))
-    print ("Protons per kton of argon: ", f"{Ar.protonsperunitmass/(1/units.kton):.1e}")
-
-'''
