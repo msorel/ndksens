@@ -1,84 +1,131 @@
-"""docstring for module mode"""
+"""Definitions of nucleon decay modes."""
 
-import units
-import math
+from dataclasses import dataclass
+
+from . import units
 
 
+@dataclass(frozen=True)
+class Mode:
+    """Description of a nucleon decay mode.
 
-class Mode(object):
-    """docstring for Mode"""
+    Attributes
+    ----------
+    symbol
+        Short identifier (e.g. "p1", "n34").
+    name
+        Human-readable decay mode name.
+    pdgnumber
+        PDG decay-mode identifier.
+    nucleontype
+        Nucleon type:
+            0 = proton
+            1 = neutron
+    pdglimit
+        Current experimental lower limit on the partial lifetime.
+    """
 
-    def __init__(self, symbol, name, pdgnumber, nucleontype, pdglimit): 
-        super(Mode, self).__init__()
-        self.symbol = symbol
-        self.name = name
-        self.pdgnumber = pdgnumber
-        self.nucleontype = nucleontype
-        self.pdglimit = pdglimit
+    symbol: str
+    name: str
+    pdgnumber: int
+    nucleontype: int
+    pdglimit: float
 
 
 ############################################################
-### NUCLEON DECAY MODES --- DATABASE
+# NUCLEON DECAY MODES --- DATABASE
+#
+# The decay-mode numbering follows the Particle Data Group
+# convention. Lifetime limits are taken from the PDG review.
+############################################################
 
-### The decay mode numbering scheme adopted matches the one of the Particle Data Group, see: http://pdg.lbl.gov/2015/listings/rpp2015-list-p.pdf. The existing limits are taken from the same source.
+#
+# Antilepton + single meson
+#
 
-### ANTILEPTON + SINGLE MESON MODES
+p1 = Mode(
+    symbol="p1",
+    name="p2epluspizero",
+    pdgnumber=1,
+    nucleontype=0,
+    pdglimit=24000e30 * units.year,
+)
 
-### p1
-symbol = 'p1'
-name = 'p2epluspizero'
-pdglimit = 8200.E30*units.year
-p1 = Mode(symbol, name, 1, 0, pdglimit)
+n1 = Mode(
+    symbol="n1",
+    name="n2epluspiminus",
+    pdgnumber=1,
+    nucleontype=1,
+    pdglimit=5300e30 * units.year,
+)
 
-### n1
-symbol = 'n1'
-name = 'n2epluspiminus'
-pdglimit = 2000.E30*units.year
-n1 = Mode(symbol, name, 1, 1, pdglimit)
+p16 = Mode(
+    symbol="p16",
+    name="p2mupluskzero",
+    pdgnumber=16,
+    nucleontype=0,
+    pdglimit=4500e30 * units.year,
+)
 
-### p16
-symbol = 'p16'
-name = 'p2mupluskzero'
-pdglimit = 1600.E30*units.year
-p16 = Mode(symbol, name, 16, 0, pdglimit)
+p19 = Mode(
+    symbol="p19",
+    name="p2nubarkplus",
+    pdgnumber=19,
+    nucleontype=0,
+    pdglimit=5900e30 * units.year,
+)
 
-### p19
-symbol = 'p19'
-name = 'p2nubarkplus'
-pdglimit = 5900.E30*units.year
-p19 = Mode(symbol, name, 19, 0, pdglimit)
+#
+# Lepton + multiple mesons
+#
 
+n34 = Mode(
+    symbol="n34",
+    name="n2eminuskplus",
+    pdgnumber=34,
+    nucleontype=1,
+    pdglimit=32e30 * units.year,
+)
 
-### ANTILEPTON + MULTIPLE MESONS MODES
+p41 = Mode(
+    symbol="p41",
+    name="p2muminuspipluskplus",
+    pdgnumber=41,
+    nucleontype=0,
+    pdglimit=245e30 * units.year,
+)
 
-### LEPTON + SINGLE MESON MODES
+############################################################
+# DICTIONARY
+############################################################
 
-### LEPTON + MULTIPLE MESONS MODES
+modes = {
+    mode.symbol: mode
+    for mode in (
+        p1,
+        n1,
+        p16,
+        p19,
+        n34,
+        p41,
+    )
+}
 
-### n34
-symbol = 'n34'
-name = 'n2eminuskplus'
-pdglimit = 32.E30*units.year
-n34 = Mode(symbol, name, 34, 1, pdglimit)
-
-### p41
-symbol = 'p41'
-name = 'p2muminuspipluskplus'
-pdglimit = 245.E30*units.year 
-p41 = Mode(symbol, name, 41, 0, pdglimit)
-
-##############################
-### DICTIONARY ###############
-
-modes = {p1.symbol: p1, n1.symbol: n1, 
-         p16.symbol: p16, p19.symbol: p19, 
-         n34.symbol: n34, p41.symbol: p41}
+__all__ = [
+    "Mode",
+    "p1",
+    "n1",
+    "p16",
+    "p19",
+    "n34",
+    "p41",
+    "modes",
+]
 
 ############################################################
 
+if __name__ == "__main__":
+    print("mode.py executed directly")
+    
 
 
-
-if __name__ == '__main__':
-
-    print "mode.py executed directly"

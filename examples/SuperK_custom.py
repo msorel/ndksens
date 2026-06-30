@@ -1,40 +1,80 @@
-###
+"""Generate a Super-Kamiokande nucleon-decay sensitivity curve."""
 
-import os.path
-FILE_PATH = os.path.dirname(os.path.realpath(__file__))
-DATA_PATH = FILE_PATH + '/../data/'
-import sys
-sys.path.append(FILE_PATH + '/..')
+from pathlib import Path
 
 import csv
-from numpy import arange
-from ndksens import units
-from ndksens import source
-from ndksens import mode
-from ndksens import experiment
+import numpy as np
+
 from ndksens import conflimits
+from ndksens import experiment
+from ndksens import mode
+from ndksens import source
+from ndksens import units
 
-FCM = conflimits.FCMemoizer(0.9)
-FCM.ReadTableAverageUpperLimits(DATA_PATH+'FC90.dat')
 
-name = 'superk_p1'
-source = source.H2O
-mass = 22.5*units.kton
-# p19: take efficiency and background numbers from arXiv:1408.1195 Super-K publication, summing contributions from prompt gamma and pi+ pi0
-# eff: 9.1% + 10.0% = 19.1%
-# p16 eff = 6.7+3.0% = 9.7% from Tab.I SK-III numbers in arXiv:1205.6538, only Ks -> pi0 pi0 and Ks -> pi+ pi- method 2 
-# p1 eff = 45.0% for SK-IV from arXiv:1203.4030
-eff = 0.450
-# p19 bgr: 1.5/Mt*yr + 2.0/Mt*yr = 3.5 / Mt*yr
-# p16 bgr: (6.0+2.8)  /Mt*yr = 8.8 / Mt*yr
-# p1 bgr: 1.7 /Mt*yr for SK-IV from arXiv:1203.4030
-bgr = 1.7/(units.Mton*units.year)
-SuperK = experiment.Experiment(name, source, mass, mode.p1, eff, bgr)
-filename = 'superk_p1.dat'
-writer = csv.writer(open(filename, 'w'))
+DATA_PATH = Path(__file__).resolve().parent.parent / "data"
 
-for expo in arange(5.,6005.,5.):
-	expo = expo * units.kton * units.year
-	sens = SuperK.sensitivity(expo,FCM)
-	print expo/(units.kton*units.year), sens/units.year
-	writer.writerow([expo/(units.kton*units.year), sens/units.year])
+
+def main():
+    # Feldman-Cousins average upper limits
+    fcm = conflimits.FCMemoizer(90)
+    fcm.ReadTableAverageUpperLimits(DATA_PATH / "FC90.dat")
+
+    # p → ν̄K⁺:
+    #   efficiency = 9.1% + 10.0% = 19.1%
+    #   background = 1.5 + 2.0 = 3.5 events/(Mt·yr)
+    #   Source: arXiv:1408.1195
+    #
+    # p → μ⁺K⁰:
+    #   efficiency = 6.7% + 3.0% = 9.7%
+    #   background = 6.0 + 2.8 = 8.8 events/(Mt·yr)
+    #   Source: arXiv:1205.6538
+    #
+    # p → e⁺π⁰ (SK-IV):
+    #   efficiency = 45.0%
+    #   background = 1.7 events/(Mt·yr)
+    #   Source: arXiv:1203.4030
+    
+    # Super-Kamiokande detector configuration
+    superk = experiment.Experiment(
+        name="superk_p1",
+        source=source.H2O,
+        mass=22.5 * units.kton,
+        mode=mode.p1,
+        eff=0.450,
+        bgr=1.7 / (units.Mton * units.year),
+    )
+
+    output_file = Path("superk_p1.dat")
+
+    with output_file.open("w", newline="") as csvfile:
+        writer = csv.writer(csvfile)
+
+        for exposure_kty in np.arange(5.0, 6005.0, 5.0):
+            exposure = exposure_kty * units.kton * units.year
+            sensitivity = superk.sensitivity(exposure, fcm)
+
+            exposure_value = exposure / (units.kton * units.year)
+            sensitivity_value = sensitivity / units.year
+
+            print(
+                f"{exposure_value:7.1f} kton·yr   "
+                f"{sensitivity_value:.3e} years"
+            )
+
+            writer.writerow(
+                [
+                    f"{exposure_value:.1f}",
+                    f"{sensitivity_value:.3e}",
+                ]
+            )
+
+
+if __name__ == "__main__":
+    main()
+
+
+
+
+
+

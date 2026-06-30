@@ -1,107 +1,138 @@
-"""docstring for experiment"""
+"""Definitions of nucleon-decay search experiments."""
 
-import source
-import mode
-import units
-import conflimits
+from dataclasses import dataclass
 
-import math
+from . import conflimits
+from . import mode
+from . import source
+from . import units
 
 
+@dataclass
+class Experiment:
+    """An experimental search for a specific nucleon decay mode."""
 
-class Experiment(object):
-    """An experimental search for a specific nucleon decay mode"""
+    name: str
+    source: source.Source
+    mass: float
+    mode: mode.Mode
+    eff: float
+    bgr: float
 
-    def __init__(self, name, source, mass, mode, eff, bgr):
-        self.name = name ### Experiment's name
-        self.source = source ### Source used by the experiment
-        self.mass = mass ### Detector mass
-        self.mode = mode ### Nucleon decay (NDK) mode searched for
-        self.eff = eff ### Detection efficiency for a given NDK mode
-        self.bgr = bgr ### Background rate for a given NDK mode
+    def Nbkg(self, exposure: float) -> float:
+        """Expected number of background events."""
+        return self.bgr * exposure
 
-    def Nbkg(self, exposure):
-        """Return the number of background events expected 
-        for a given exposure."""
-        return (self.bgr * exposure)
-
-    def sensitivity(self, exposure, clc):
-        """Return the experiment's partial lifetime sensitivity for this NDK decay mode."""
+    def sensitivity(self, exposure: float,
+                    clc: conflimits.FCMemoizer) -> float:
+        """Partial lifetime sensitivity."""
         aul = clc.AverageUpperLimit(self.Nbkg(exposure))
-        return self.source.protonsperunitmass*self.eff*exposure/aul
+        return (
+            self.source.protonsperunitmass
+            * self.eff
+            * exposure
+            / aul
+        )
 
 
 ############################################################
-### DUNE NUCLEON DECAY SEARCHES --- DATABASE
-
-### The pre-defined efficiency/background assumptions for an argon-based detector are taken from: A. Bueno et al., "Nucleon decay searches with large liquid argon TPC detectors at shallow depths: atmospheric and cosmogenic backgrounds," JHEP 0704 (2007) 041, http://arxiv.org/abs/hep-ph/0701101
-
-source = source.Ar
-mass = 40*units.kton
-
-### dune_p1
-name = 'dune_p1'
-eff = 0.45
-bgr = 1./(units.Mton*units.year)
-dune_p1 = Experiment(name, source, mass, mode.p1, eff, bgr)
-
-### dune_n1
-name = 'dune_n1'
-eff = 0.44
-bgr = 8./(units.Mton*units.year)
-dune_n1 = Experiment(name, source, mass, mode.n1, eff, bgr)
-
-### dune_p16
-name = 'dune_p16'
-eff = 0.47
-bgr = 2./(units.Mton*units.year)
-dune_p16 = Experiment(name, source, mass, mode.p16, eff, bgr)
-
-### dune_p19
-name = 'dune_p19'
-eff = 0.97
-bgr = 1./(units.Mton*units.year)
-dune_p19 = Experiment(name, source, mass, mode.p19, eff, bgr)
-
-### dune_n34
-name = 'dune_n34'
-eff = 0.96
-bgr = 2./(units.Mton*units.year)
-dune_n34 = Experiment(name, source, mass, mode.n34, eff, bgr)
-
-### dune_p41
-name = 'dune_p41'
-eff = 0.98
-bgr = 1./(units.Mton*units.year)
-dune_p41 = Experiment(name, source, mass, mode.p41, eff, bgr)
-
-
-##############################
-### DICTIONARY ###############
-
-experiments = {dune_p1.name: dune_p1, dune_n1.name: dune_n1, 
-               dune_p16.name: dune_p16, dune_p19.name: dune_p19, 
-               dune_n34.name: dune_n34, dune_p41.name: dune_p41}
-
+# DUNE nucleon decay searches
 ############################################################
 
+argon = source.Ar
+detector_mass = 40 * units.kton
+
+dune_p1 = Experiment(
+    "dune_p1",
+    argon,
+    detector_mass,
+    mode.p1,
+    0.45,
+    1.0 / (units.Mton * units.year),
+)
+
+dune_n1 = Experiment(
+    "dune_n1",
+    argon,
+    detector_mass,
+    mode.n1,
+    0.44,
+    8.0 / (units.Mton * units.year),
+)
+
+dune_p16 = Experiment(
+    "dune_p16",
+    argon,
+    detector_mass,
+    mode.p16,
+    0.47,
+    2.0 / (units.Mton * units.year),
+)
+
+dune_p19 = Experiment(
+    "dune_p19",
+    argon,
+    detector_mass,
+    mode.p19,
+    0.97,
+    1.0 / (units.Mton * units.year),
+)
+
+dune_n34 = Experiment(
+    "dune_n34",
+    argon,
+    detector_mass,
+    mode.n34,
+    0.96,
+    2.0 / (units.Mton * units.year),
+)
+
+dune_p41 = Experiment(
+    "dune_p41",
+    argon,
+    detector_mass,
+    mode.p41,
+    0.98,
+    1.0 / (units.Mton * units.year),
+)
+
+experiments = {
+    exp.name: exp
+    for exp in (
+        dune_p1,
+        dune_n1,
+        dune_p16,
+        dune_p19,
+        dune_n34,
+        dune_p41,
+    )
+}
 
 
+if __name__ == "__main__":
 
-if __name__ == '__main__':
+    print("experiment.py executed directly")
 
-    print "experiment.py executed directly"
-
-    name = "dune_test"
-    mass = 40.*units.kton 
-    eff  = 1.
-    bgr  = 1. /(units.Mton*units.year)
-
-    dune_test = Experiment(name, source.Ar, mass, mode.n1, eff, bgr)
+    dune_test = Experiment(
+        "dune_test",
+        source.Ar,
+        40 * units.kton,
+        mode.n1,
+        1.0,
+        1.0 / (units.Mton * units.year),
+    )
 
     FC = conflimits.FCMemoizer(90)
     FC.ReadTableAverageUpperLimits()
-    sens = dune_test.sensitivity(400.*units.kton*units.year, FC)
 
-    print "Sensitivity (at 90% CL) of the dune_test experiment: {0:.1e} years.".format(sens/units.year)
+    sens = dune_test.sensitivity(
+        400 * units.kton * units.year,
+        FC,
+    )
+
+    print(
+        f"Sensitivity (90% CL): "
+        f"{sens / units.year:.1e} years."
+    )
+
 

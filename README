@@ -1,3 +1,6 @@
+
+
+
 # ndksens: nucleon decay sensitivity
 
 ndksens is a set of python scripts to compute partial lifetime sensitivities as a function of exposure for nucleon decay experimental searches. Pre-defined efficiency/background rate assumptions for several decay modes are defined for an argon-based DUNE-like setup. The scripts can also be easily customized for any other source/efficiency/background conditions.   
